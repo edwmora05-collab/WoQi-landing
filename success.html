@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to WoQi Beta - Confirmation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #FF6B00;
+      --dark-bg: #0F0F0F;
+      --white: #FFFFFF;
+      --white-70: rgba(255, 255, 255, 0.7);
+      --white-40: rgba(255, 255, 255, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--dark-bg);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .success-container {
+      text-align: center;
+      max-width: 600px;
+      animation: fadeIn 0.8s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 30px;
+      animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--white) 0%, var(--orange) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      color: var(--white-70);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .confirmation-box {
+      background: rgba(255, 107, 0, 0.08);
+      border: 1px solid rgba(255, 107, 0, 0.3);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 40px;
+      backdrop-filter: blur(10px);
+    }
+
+    .confirmation-text {
+      font-size: 16px;
+      color: var(--white-70);
+      margin-bottom: 15px;
+    }
+
+    .confirmation-highlight {
+      color: var(--orange);
+      font-weight: 600;
+    }
+
+    .next-steps {
+      text-align: left;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 40px;
+    }
+
+    .next-steps h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: var(--orange);
+    }
+
+    .next-steps ol {
+      list-style: none;
+      counter-reset: step-counter;
+    }
+
+    .next-steps li {
+      counter-increment: step-counter;
+      margin-bottom: 12px;
+      font-size: 15px;
+      color: var(--white-70);
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .next-steps li::before {
+      content: counter(step-counter);
+      background: var(--orange);
+      color: var(--dark-bg);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      margin-right: 12px;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: var(--orange);
+      color: var(--dark-bg);
+      padding: 16px 40px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(255, 107, 0, 0.3);
+    }
+
+    .cta-button.secondary {
+      background: transparent;
+      color: var(--orange);
+      border: 2px solid var(--orange);
+    }
+
+    .cta-button.secondary:hover {
+      background: rgba(255, 107, 0, 0.1);
+    }
+
+    .footer-text {
+      font-size: 14px;
+      color: var(--white-40);
+      margin-top: 40px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 30px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: var(--orange);
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <div class="logo">Wo<span>Qi</span></div>
+    
+    <div class="success-icon">✨</div>
+    
+    <h1>You're In!</h1>
+    
+    <p class="subtitle">
+      Welcome to the WoQi Beta community. We're excited to have you on board!
+    </p>
+
+    <div class="confirmation-box">
+      <p class="confirmation-text">
+        We've sent you a <span class="confirmation-highlight">confirmation email</span> with your exclusive beta access link and next steps.
+      </p>
+      <p class="confirmation-text">
+        Check your inbox (and spam folder, just in case) for the invite.
+      </p>
+    </div>
+
+    <div class="next-steps">
+      <h3>What's Next?</h3>
+      <ol>
+        <li>Check your email for the exclusive beta invite link</li>
+        <li>Click the link to access the WoQi beta platform</li>
+        <li>Set up your profile and start finding your perfect study spot</li>
+        <li>Share feedback with us to help shape the future of WoQi</li>
+      </ol>
+    </div>
+
+    <div>
+      <a href="/" class="cta-button">Back to Home</a>
+      <a href="mailto:hello@woqi.app" class="cta-button secondary">Contact Us</a>
+    </div>
+
+    <p class="footer-text">
+      Questions? Reach out to us at <strong>hello@woqi.app</strong><br>
+      We're here to help! 🚀
+    </p>
+  </div>
+</body>
+</html>
