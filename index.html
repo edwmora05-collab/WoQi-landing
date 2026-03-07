@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WoQi — Stop Studying Alone. Start Performing Together.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0F0F0F;
+      --bg2: #141414;
+      --bg3: #1A1A1A;
+      --orange: #FF6B00;
+      --orange-glow: rgba(255, 107, 0, 0.35);
+      --orange-dim: rgba(255, 107, 0, 0.12);
+      --white: #FFFFFF;
+      --white-70: rgba(255,255,255,0.70);
+      --white-40: rgba(255,255,255,0.40);
+      --white-15: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.08);
+      --glass-bg: rgba(255,255,255,0.04);
+      --radius: 20px;
+      --radius-sm: 12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ===== NOISE TEXTURE OVERLAY ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ===== AMBIENT GLOW BACKGROUND ===== */
+    .ambient {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,107,0,0.12) 0%, transparent 70%);
+      top: -200px; right: -200px;
+    }
+    .ambient-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(255,107,0,0.07) 0%, transparent 70%);
+      bottom: 20%; left: -150px;
+    }
+
+    /* ===== FLOATING NAV ===== */
+    nav {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      padding: 12px 28px;
+      background: rgba(15,15,15,0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      width: min(900px, 92vw);
+      transition: all 0.3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(15,15,15,0.92);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    .nav-logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--orange); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white-70);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+
+    .btn-orange {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--orange);
+      color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 20px var(--orange-glow), 0 4px 16px rgba(255,107,0,0.3);
+    }
+    .btn-orange:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 36px var(--orange-glow), 0 8px 24px rgba(255,107,0,0.4);
+    }
+    .btn-orange-lg {
+      padding: 16px 36px;
+      font-size: 16px;
+      border-radius: 50px;
+    }
+
+    /* ===== MAIN WRAPPER ===== */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== SECTION SPACING ===== */
+    section { padding: 80px 0; }
+
+    /* ===== HERO SECTION ===== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding-top: 120px;
+      padding-bottom: 80px;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--orange-dim);
+      border: 1px solid rgba(255,107,0,0.3);
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--orange);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.6s ease both;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--orange);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--orange);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero-headline {
+      font-size: clamp(42px, 7vw, 88px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s 0.1s ease both;
+    }
+    .hero-headline .accent { color: var(--orange); }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 400;
+      color: var(--white-70);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+      animation: fadeInUp 0.6s 0.2s ease both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.6s 0.3s ease both;
+      margin-bottom: 72px;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 32px;
+      background: transparent;
+      color: var(--white-70);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover {
+      background: var(--white-15);
+      color: var(--white);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    /* ===== PHONE MOCKUP ===== */
+    .phone-mockup-wrapper {
+      position: relative;
+      display: inline-block;
+      animation: fadeInUp 0.8s 0.4s ease both;
+    }
+
+    .phone-glow {
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(ellipse at center, rgba(255,107,0,0.2) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .phone-frame {
+      width: 260px;
+      height: 520px;
+      background: linear-gradient(145deg, #1e1e1e, #111);
+      border-radius: 44px;
+      border: 2px solid rgba(255,255,255,0.12);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 28px;
+      background: #0a0a0a;
+      border-radius: 20px;
+      z-index: 2;
+    }
+
+    .phone-screen {
+      position: absolute;
+      inset: 0;
+      padding: 60px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .phone-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--orange);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .phone-title {
+      font-size: 16px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .phone-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .phone-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .phone-card-icon.orange { background: var(--orange-dim); color: var(--orange); }
+    .phone-card-icon.green { background: rgba(0,200,100,0.12); color: #00C864; }
+    .phone-card-icon.blue { background: rgba(0,120,255,0.12); color: #0078FF; }
+
+    .phone-card-text { font-size: 10px; color: var(--white-70); line-height: 1.4; }
+    .phone-card-title { font-size: 11px; font-weight: 700; color: var(--white); }
+
+    .phone-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+    .phone-bar-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 2px;
+    }
+
+    .phone-score {
+      text-align: center;
+      margin-top: 4px;
+    }
+    .phone-score-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--orange);
+    }
+    .phone-score-label {
+      font-size: 9px;
+      color: var(--white-40);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ===== PROBLEM SECTION ===== */
+    #problem {
+      text-align: center;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+
+    .section-text {
+      font-size: 18px;
+      color: var(--white-70);
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    .problem-stats {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-top: 56px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 36px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: rgba(255,107,0,0.3);
+    }
+    .stat-num {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--orange);
+      line-height: 1;
+    }
+    .stat-desc {
+      font-size: 13px;
+      color: var(--white-40);
+      margin-top: 6px;
+    }
+
+    /* ===== BENTO GRID ===== */
+    #features {
+      padding: 80px 0;
+    }
+
+    .bento-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto;
+      gap: 16px;
+    }
+
+    /* ===== GLASS CARD BASE ===== */
+    .bento-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  border-color 0.35s ease,
+                  box-shadow 0.35s ease;
+      cursor: default;
+    }
+
+    .bento-card:hover {
+      transform: translateY(-6px) scale(1.015);
+      border-color: rgba(255,107,0,0.25);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,107,0,0.1);
+    }
+
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Grid placement */
+    .card-hero    { grid-column: span 7; min-height: 380px; }
+    .card-ai      { grid-column: span 5; min-height: 380px; }
+    .card-mission { grid-column: span 4; min-height: 260px; }
+    .card-deep    { grid-column: span 4; min-height: 260px; }
+    .card-team    { grid-column: span 4; min-height: 260px; }
+
+    /* ===== CARD: HERO BENTO ===== */
+    .card-hero {
+      background: linear-gradient(135deg, #1A1A1A 0%, #111 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--orange);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .card-hero-title {
+      font-size: clamp(22px, 3vw, 34px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .card-hero-sub {
+      font-size: 15px;
+      color: var(--white-70);
+      line-height: 1.7;
+      margin-bottom: 28px;
+      max-width: 380px;
+    }
+
+    /* Abstract 3D shape SVG inside hero card */
+    .hero-shape {
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 280px;
+      height: 280px;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    /* ===== CARD: AI MATCHING ===== */
+    .card-ai {
+      background: linear-gradient(135deg, rgba(255,107,0,0.08) 0%, rgba(15,15,15,0.9) 60%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+    .card-icon.orange { background: var(--orange-dim); border: 1px solid rgba(255,107,0,0.2); }
+    .card-icon.white  { background: rgba(255,255,255,0.06); border: 1px solid var(--border); }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 12px;
+    }
+
+    .card-text {
+      font-size: 14px;
+      color: var(--white-70);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    /* Map visual inside AI card */
+    .map-visual {
+      margin-top: 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      height: 120px;
+    }
+
+    .map-dot {
+      position: absolute;
+      border-radius: 50%;
+      animation: mapPulse 3s infinite;
+    }
+    .map-dot-1 { width: 12px; height: 12px; background: var(--orange); top: 30%; left: 25%; box-shadow: 0 0 20px var(--orange); animation-delay: 0s; }
+    .map-dot-2 { width: 8px; height: 8px; background: rgba(255,107,0,0.6); top: 55%; left: 60%; animation-delay: 1s; }
+    .map-dot-3 { width: 6px; height: 6px; background: rgba(255,107,0,0.4); top: 20%; left: 70%; animation-delay: 2s; }
+    .map-dot-4 { width: 10px; height: 10px; background: rgba(255,107,0,0.5); top: 65%; left: 40%; animation-delay: 0.5s; }
+
+    .map-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,107,0,0.3);
+      animation: mapRing 3s infinite;
+      top: 30%; left: 25%;
+      transform: translate(-50%, -50%);
+    }
+    .map-ring-1 { width: 40px; height: 40px; animation-delay: 0s; }
+    .map-ring-2 { width: 70px; height: 70px; animation-delay: 0.5s; }
+
+    @keyframes mapPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.3); }
+    }
+    @keyframes mapRing {
+      0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); }
+    }
+
+    .map-label {
+      position: absolute;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--orange);
+      top: calc(30% - 22px);
+      left: calc(25% + 8px);
+      background: rgba(255,107,0,0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,107,0,0.3);
+    }
+
+    .map-grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    /* ===== CARD: MISSION ===== */
+    .card-mission {
+      background: linear-gradient(135deg, #1A1A1A 0%, #0F0F0F 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .mission-quote {
+      font-size: clamp(15px, 1.8vw, 18px);
+      font-weight: 600;
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--white);
+      position: relative;
+      padding-left: 20px;
+    }
+    .mission-quote::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 4px;
+      bottom: 4px;
+      width: 3px;
+      background: var(--orange);
+      border-radius: 2px;
+    }
+
+    /* ===== CARD: DEEP WORK ===== */
+    .card-deep {
+      background: linear-gradient(135deg, rgba(255,107,0,0.06) 0%, #0F0F0F 100%);
+    }
+
+    .lock-visual {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .blocked-app {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+
+    .app-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .app-name { font-size: 12px; font-weight: 600; flex: 1; }
+    .app-status {
+      font-size: 10px;
+      font-weight: 700;
+      color: #FF4444;
+      background: rgba(255,68,68,0.12);
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,68,68,0.2);
+    }
+    .app-status.unlocked {
+      color: #00C864;
+      background: rgba(0,200,100,0.12);
+      border-color: rgba(0,200,100,0.2);
+    }
+
+    .timer-display {
+      text-align: center;
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(255,107,0,0.08);
+      border: 1px solid rgba(255,107,0,0.2);
+      border-radius: 12px;
+    }
+    .timer-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--orange);
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-label { font-size: 10px; color: var(--white-40); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ===== CARD: TEAM SYNC ===== */
+    .card-team {
+      background: linear-gradient(135deg, #1A1A1A 0%, #111 100%);
+    }
+
+    .team-report {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .report-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .report-title { font-size: 11px; font-weight: 700; color: var(--white); }
+    .report-live {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #00C864;
+    }
+    .report-live::before {
+      content: '';
+      width: 5px; height: 5px;
+      background: #00C864;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    .team-member {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .team-member:last-child { border-bottom: none; }
+
+    .member-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .member-name { font-size: 11px; font-weight: 600; flex: 1; }
+    .member-progress { font-size: 10px; color: var(--white-40); }
+
+    .member-bar-wrap {
+      width: 60px;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .member-bar {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--orange);
+    }
+
+    /* ===== MISSION SECTION ===== */
+    #mission {
+      text-align: center;
+      padding: 100px 0;
+    }
+
+    .mission-big {
+      font-size: clamp(22px, 3.5vw, 40px);
+      font-weight: 700;
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--white-70);
+      max-width: 780px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .mission-big .highlight { color: var(--white); font-style: normal; font-weight: 800; }
+    .mission-big .orange-text { color: var(--orange); }
+
+    /* ===== TEAM SECTION ===== */
+    #team {
+      text-align: center;
+      padding: 80px 0;
+    }
+
+    .team-built {
+      font-size: 16px;
+      color: var(--white-70);
+      margin-bottom: 40px;
+    }
+
+    .team-built strong { color: var(--white); }
+
+    .linkedin-placeholder {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--glass-bg);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 14px;
+      color: var(--white-40);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .linkedin-placeholder:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+    }
+    .footer-logo span { color: var(--orange); }
+
+    .footer-copy {
+      font-size: 13px;
+      color: var(--white-40);
+    }
+
+    .footer-ied {
+      font-size: 13px;
+      color: var(--white-40);
+    }
+    .footer-ied strong { color: var(--white-70); }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== DIVIDER ===== */
+    .divider {
+      width: 60px;
+      height: 3px;
+      background: var(--orange);
+      border-radius: 2px;
+      margin: 24px auto;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .card-hero, .card-ai { grid-column: span 12; }
+      .card-mission, .card-deep, .card-team { grid-column: span 12; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 10px 20px; }
+      .hero-headline { letter-spacing: -1px; }
+      .phone-frame { width: 220px; height: 440px; }
+    }
+
+    /* ===== SCROLL INDICATOR ===== */
+    .scroll-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: fadeInUp 0.6s 0.8s ease both;
+    }
+    .scroll-indicator span {
+      font-size: 11px;
+      color: var(--white-40);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .scroll-arrow {
+      width: 20px;
+      height: 20px;
+      border-right: 2px solid var(--white-40);
+      border-bottom: 2px solid var(--white-40);
+      transform: rotate(45deg);
+      animation: scrollBounce 1.5s infinite;
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: rotate(45deg) translateY(0); opacity: 1; }
+      50% { transform: rotate(45deg) translateY(6px); opacity: 0.5; }
+    }
+
+    /* ===== ABSTRACT SVG SHAPES ===== */
+    .shape-blob {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.06;
+    }
+
+    /* ===== BETA FORM STYLES ===== */
+    .beta-form {
+      max-width: 500px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white-70);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+      padding: 14px 16px;
+      background: var(--glass-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input::placeholder {
+      color: var(--white-40);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      background: rgba(255, 107, 0, 0.05);
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+    }
+
+    .form-note {
+      text-align: center;
+      font-size: 13px;
+      color: var(--white-40);
+      margin-top: 16px;
+    }
+
+    #betaForm button {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #betaForm button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px var(--orange-glow);
+    }
+
+    #betaForm button:active {
+      transform: translateY(0);
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Ambient glows -->
+  <div class="ambient ambient-1"></div>
+  <div class="ambient ambient-2"></div>
+
+  <!-- ===== FLOATING NAV ===== -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">Wo<span>Qi</span></a>
+    <ul class="nav-links">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#mission">Mission</a></li>
+
+    </ul>
+    <a href="#join-beta" class="btn-orange">Join the Beta</a>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <main>
+
+    <!-- ===== HERO ===== -->
+    <section id="hero">
+
+      <!-- Badge -->
+      <div class="hero-badge">AI Agent matching student psychological profiles to high-performance study environments.</div>
+
+      <!-- Headline -->
+      <h1 class="hero-headline">
+        Stop Studying <span class="accent">Alone.</span><br/>
+        Start Performing <span class="accent">Together.</span>
+      </h1>
+
+      <!-- Sub -->
+      <p class="hero-sub">
+        WoQi is the AI Agent that transforms your city into a high-performance habitat. Find your spot, sync with your team, and lock out distractions.
+      </p>
+
+      <!-- CTA -->
+      <div class="hero-cta">
+        <a href="#join-beta" class="btn-orange btn-orange-lg">Join the Beta</a>
+        <a href="#features" class="btn-ghost">See How It Works ↓</a>
+      </div>
+
+      <!-- Phone Mockup with Real App Screenshot -->
+      <div class="phone-mockup-wrapper">
+        <div class="phone-glow"></div>
+        <img src="phone-mockup.png" alt="Work & Quiet App Screenshot" style="width: 260px; height: auto; display: block; border-radius: 44px; box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);" />
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="scroll-indicator" style="margin-top: 48px;">
+        <span>Scroll</span>
+        <div class="scroll-arrow"></div>
+      </div>
+
+    </section>
+
+    <!-- ===== PROBLEM ===== -->
+    <section id="problem" class="reveal">
+      <div class="section-label">⚠ The Problem</div>
+      <h2 class="section-title">The Productivity Paradox</h2>
+      <div class="divider"></div>
+      <p class="section-text">
+        Home is distracting. Libraries are full. Finding a focus-friendly spot is a gamble. You are the product of your environment—it's time to optimize it for success.
+      </p>
+      <div class="problem-stats">
+        <div class="stat-card reveal">
+          <div class="stat-num">71%</div>
+          <div class="stat-desc">of students feel stressed by studying</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-num">50%</div>
+          <div class="stat-desc">struggle to find an effective study method</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-num">63%</div>
+          <div class="stat-desc">get distracted by smartphones and social media</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BENTO FEATURES ===== -->
+    <section id="features">
+      <div class="bento-header reveal">
+        <div class="section-label">🛠 Features</div>
+        <h2 class="section-title">Everything You Need to Perform</h2>
+        <div class="divider"></div>
+      </div>
+
+      <div class="bento-grid">
+
+        <!-- HERO BENTO CARD -->
+        <div class="bento-card card-hero reveal">
+          <!-- Abstract SVG shape -->
+          <svg class="hero-shape" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M150 20 C200 20 270 80 270 150 C270 220 200 280 150 280 C100 280 30 220 30 150 C30 80 100 20 150 20Z" stroke="#FF6B00" stroke-width="1.5" fill="none"/>
+            <path d="M150 50 C185 50 240 100 240 150 C240 200 185 250 150 250 C115 250 60 200 60 150 C60 100 115 50 150 50Z" stroke="#FF6B00" stroke-width="1" fill="none" opacity="0.5"/>
+            <path d="M150 80 C175 80 210 115 210 150 C210 185 175 220 150 220 C125 220 90 185 90 150 C90 115 125 80 150 80Z" stroke="#FF6B00" stroke-width="0.8" fill="none" opacity="0.3"/>
+            <circle cx="150" cy="150" r="20" stroke="#FF6B00" stroke-width="1" fill="rgba(255,107,0,0.1)"/>
+            <line x1="150" y1="20" x2="150" y2="50" stroke="#FF6B00" stroke-width="1" opacity="0.6"/>
+            <line x1="270" y1="150" x2="240" y2="150" stroke="#FF6B00" stroke-width="1" opacity="0.6"/>
+            <line x1="150" y1="280" x2="150" y2="250" stroke="#FF6B00" stroke-width="1" opacity="0.6"/>
+            <line x1="30" y1="150" x2="60" y2="150" stroke="#FF6B00" stroke-width="1" opacity="0.6"/>
+          </svg>
+
+          <div>
+            <div class="card-hero-tag">
+              <span>●</span> WoQi Platform
+            </div>
+            <h3 class="card-hero-title">Your city is your<br/><span style="color:var(--orange)">campus.</span></h3>
+            <p class="card-hero-sub">
+              WoQi maps every café, library, and co-working space in real-time — scored by noise, occupancy, and community fit — so you always have the perfect spot.
+            </p>
+            <a href="#join-beta" class="btn-orange">Join the Beta</a>
+          </div>
+
+          <div style="display:flex; gap:12px; margin-top:24px; flex-wrap:wrap;">
+            <div style="background:rgba(255,107,0,0.1); border:1px solid rgba(255,107,0,0.2); border-radius:8px; padding:8px 14px; font-size:12px; font-weight:600; color:var(--orange);">AI Powered</div>
+            <div style="background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:12px; font-weight:600; color:var(--white-70);">Real-time Data</div>
+
+          </div>
+        </div>
+
+        <!-- AI MATCHING CARD -->
+        <div class="bento-card card-ai reveal">
+          <div class="card-icon orange">🧠</div>
+          <h3 class="card-title">AI Environment Matching</h3>
+          <p class="card-text">
+            Our AI analyzes your psychological profile and major to find the quietest, most productive spots in real-time based on noise, occupancy, and community.
+          </p>
+          <div class="map-visual">
+            <div class="map-grid-lines"></div>
+            <div class="map-ring map-ring-1"></div>
+            <div class="map-ring map-ring-2"></div>
+            <div class="map-dot map-dot-1"></div>
+            <div class="map-dot map-dot-2"></div>
+            <div class="map-dot map-dot-3"></div>
+            <div class="map-dot map-dot-4"></div>
+            <div class="map-label">Best Match</div>
+          </div>
+        </div>
+
+
+
+        <!-- DEEP WORK CARD -->
+        <div class="bento-card card-deep reveal">
+          <div class="card-icon orange">🔒</div>
+          <h3 class="card-title">Deep Work Protocol</h3>
+          <p class="card-text">Social media stays blocked until you prove your progress via active recall tests or a "Proof of Work" photo.</p>
+          <div class="lock-visual">
+            <div class="blocked-app">
+              <div class="app-icon" style="background:rgba(29,161,242,0.15); color:#1DA1F2;">𝕏</div>
+              <span class="app-name">Twitter / X</span>
+              <span class="app-status">Blocked</span>
+            </div>
+            <div class="blocked-app">
+              <div class="app-icon" style="background:rgba(225,48,108,0.15); color:#E1306C;">📸</div>
+              <span class="app-name">Instagram</span>
+              <span class="app-status">Blocked</span>
+            </div>
+            <div class="blocked-app">
+              <div class="app-icon" style="background:rgba(0,200,100,0.12); color:#00C864;">✓</div>
+              <span class="app-name">Notion</span>
+              <span class="app-status unlocked">Allowed</span>
+            </div>
+          </div>
+          <div class="timer-display">
+            <div class="timer-num" id="timer">01:47:32</div>
+            <div class="timer-label">Deep Work Session</div>
+          </div>
+        </div>
+
+        <!-- TEAM SYNC CARD -->
+        <div class="bento-card card-team reveal">
+          <div class="card-icon orange">⚡</div>
+          <h3 class="card-title">Smart Team Sync</h3>
+          <p class="card-text">Create an event and WoQi sends an instant Smart Report to your team with location, goals, and live updates.</p>
+          <div class="team-report">
+            <div class="report-header">
+              <span class="report-title">📋 Smart Report — Session #12</span>
+              <span class="report-live">LIVE</span>
+            </div>
+            <div class="team-member">
+              <div class="member-avatar" style="background:rgba(255,107,0,0.2); color:var(--orange);">A</div>
+              <span class="member-name">Alessandro</span>
+              <div class="member-bar-wrap"><div class="member-bar" style="width:90%"></div></div>
+              <span class="member-progress">90%</span>
+            </div>
+            <div class="team-member">
+              <div class="member-avatar" style="background:rgba(0,200,100,0.15); color:#00C864;">S</div>
+              <span class="member-name">Sofia</span>
+              <div class="member-bar-wrap"><div class="member-bar" style="width:75%; background:#00C864"></div></div>
+              <span class="member-progress">75%</span>
+            </div>
+            <div class="team-member">
+              <div class="member-avatar" style="background:rgba(0,120,255,0.15); color:#0078FF;">M</div>
+              <span class="member-name">Marco</span>
+              <div class="member-bar-wrap"><div class="member-bar" style="width:60%; background:#0078FF"></div></div>
+              <span class="member-progress">60%</span>
+            </div>
+            <div class="team-member">
+              <div class="member-avatar" style="background:rgba(200,100,255,0.15); color:#C864FF;">L</div>
+              <span class="member-name">Laura</span>
+              <div class="member-bar-wrap"><div class="member-bar" style="width:45%; background:#C864FF"></div></div>
+              <span class="member-progress">45%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== MISSION SECTION ===== -->
+    <section id="mission" class="reveal">
+      <div class="section-label">🌟 Our Mission</div>
+      <div class="divider"></div>
+      <p class="mission-big">
+        "We believe your <span class="highlight">environment</span> should work as hard as <span class="orange-text">you do.</span> WoQi bridges the gap between <span class="highlight">academic isolation</span> and <span class="orange-text">professional focus.</span>"
+      </p>
+    </section>
+
+    <!-- ===== JOIN BETA SECTION ===== -->
+    <section id="join-beta" class="reveal">
+      <div class="section-label">📝 Join the Beta</div>
+      <h2 class="section-title">Be Among the First</h2>
+      <div class="divider"></div>
+      <p class="team-built" style="margin-bottom: 24px;">
+        <strong>Built by students for students.</strong> Driven by AI, designed for Focus.
+      </p>
+      <p class="section-text" style="margin-bottom: 40px;">
+        Get early access to WoQi and help shape the future of student productivity.
+      </p>
+      
+      <form id="betaForm" class="beta-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="Your full name" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="your@email.com" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="university">University</label>
+          <input type="text" id="university" name="university" placeholder="Your university name" required />
+        </div>
+        
+        <button type="submit" class="btn-orange btn-orange-lg" style="width: 100%; margin-top: 20px;">Join the Beta</button>
+      </form>
+      
+      <p class="form-note">We'll send you an exclusive invite link. No spam, we promise.</p>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-logo">Wo<span>Qi</span></div>
+    <div class="footer-copy">© 2025 WoQi. All rights reserved.</div>
+
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Live timer
+    let seconds = 6452; // 1h 47m 32s
+    const timerEl = document.getElementById('timer');
+    setInterval(() => {
+      seconds++;
+      const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+      const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      if (timerEl) timerEl.textContent = `${h}:${m}:${s}`;
+    }, 1000);
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Beta form submission
+    const betaForm = document.getElementById('betaForm');
+    if (betaForm) {
+      betaForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const university = document.getElementById('university').value;
+        
+        // Store data
+        const formData = { name, email, university, timestamp: new Date().toISOString() };
+        console.log('Beta signup:', formData);
+        
+        // Show success message
+        const button = betaForm.querySelector('button');
+        const originalText = button.textContent;
+        button.textContent = 'Thanks for joining!';
+        button.style.opacity = '0.8';
+        
+        // Reset form
+        betaForm.reset();
+        
+        // Restore button after 3 seconds
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.opacity = '';
+        }, 3000);
+      });
+    }
+  </script>
+
+</body>
+</html>
