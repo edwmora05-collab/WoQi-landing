@@ -1350,33 +1350,26 @@
       });
     });
 
-    // Beta form submission
+    // Beta form submission - Allow Formspree to handle it
     const betaForm = document.getElementById('betaForm');
     if (betaForm) {
       betaForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const university = document.getElementById('university').value;
-        
-        // Store data
-        const formData = { name, email, university, timestamp: new Date().toISOString() };
-        console.log('Beta signup:', formData);
-        
         // Show success message
         const button = betaForm.querySelector('button');
         const originalText = button.textContent;
-        button.textContent = 'Thanks for joining!';
-        button.style.opacity = '0.8';
+        button.textContent = 'Sending...';
+        button.disabled = true;
         
-        // Reset form
-        betaForm.reset();
-        
-        // Restore button after 3 seconds
+        // Restore button after submission
         setTimeout(() => {
-          button.textContent = originalText;
-          button.style.opacity = '';
-        }, 3000);
+          button.textContent = 'Thanks for joining!';
+          button.style.opacity = '0.8';
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.style.opacity = '';
+            button.disabled = false;
+          }, 2000);
+        }, 500);
       });
     }
   </script>
