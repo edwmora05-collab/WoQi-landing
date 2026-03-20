@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoQi - Find Your Perfect Place to Focus</title>
+    <!-- Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Leaflet CSS for Interactive Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        /* Integrated Styles from pasted_content_2.txt and improvements */
+        :root {
+            --primary-color: #FF6B00;
+            --primary-glow: rgba(255, 107, 0, 0.3);
+            --bg-dark: #0F0F0F;
+            --bg-darker: #080808;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent-blue: #00A3FF;
+            --accent-purple: #BF5AF2;
+            --accent-green: #32D74B;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .text-gradient {
+            background: linear-gradient(135deg, #fff 0%, var(--primary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 20px 0; transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid transparent;
+        }
+        .navbar.scrolled {
+            background: rgba(15, 15, 15, 0.8);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 24px; }
+        .logo-mark { color: var(--primary-color); }
+        .nav-links { display: flex; gap: 32px; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--primary-color); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 12px 24px; border-radius: 12px; font-weight: 600;
+            text-decoration: none; transition: all 0.3s ease; cursor: pointer; border: none;
+        }
+        .btn-primary { 
+            background: var(--primary-color); color: white; 
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
+        .btn-outline { 
+            background: transparent; border: 1px solid var(--glass-border); color: white; 
+        }
+        .btn-outline:hover { background: var(--glass); border-color: var(--text-muted); }
+        .btn-lg { padding: 16px 32px; font-size: 18px; }
+        .btn-sm { padding: 8px 16px; font-size: 14px; }
+
+        /* Hero */
+        .hero { padding-top: 160px; padding-bottom: 80px; position: relative; }
+        .hero-title { font-family: var(--font-heading); font-size: clamp(40px, 8vw, 72px); line-height: 1.1; margin-bottom: 24px; font-weight: 800; }
+        .hero-subtitle { font-size: 20px; max-width: 600px; margin: 0 auto 40px; color: var(--text-muted); }
+        .badge-new {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            padding: 6px 16px; border-radius: 100px; font-size: 14px; font-weight: 500;
+        }
+        .pulse-dot { width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 107, 0, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); } }
+
+        /* Sections */
+        .section { padding: 100px 0; }
+        .bg-darker { background-color: var(--bg-darker); }
+        .section-header { margin-bottom: 60px; }
+        .section-title { font-family: var(--font-heading); font-size: clamp(32px, 5vw, 48px); font-weight: 800; margin-bottom: 16px; }
+        .section-subtitle { color: var(--text-muted); max-width: 700px; margin: 0 auto; font-size: 18px; }
+
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-auto-rows: minmax(200px, auto);
+            gap: 24px;
+        }
+        .bento-card {
+            grid-column: span 4;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bento-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .bento-large { grid-column: span 8; grid-row: span 2; display: flex; flex-direction: column; }
+        .bento-wide { grid-column: span 12; display: flex; align-items: center; }
+        
+        .icon-box { 
+            width: 48px; height: 48px; background: var(--glass); 
+            border-radius: 12px; display: flex; align-items: center; 
+            justify-content: center; font-size: 20px; margin-bottom: 20px;
+        }
+        .text-primary { color: var(--primary-color); }
+        .text-blue { color: var(--accent-blue); }
+        .text-purple { color: var(--accent-purple); }
+        .text-green { color: var(--accent-green); }
+
+        /* Map Mockup */
+        .map-container {
+            flex-grow: 1;
+            margin-top: 24px;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--glass-border);
+            min-height: 300px;
+        }
+        #leaflet-map { width: 100%; height: 100%; z-index: 1; }
+        
+        /* Custom Map Markers */
+        .custom-marker {
+            background: var(--primary-color);
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+        .pulse-marker {
+            position: relative;
+        }
+        .pulse-marker::after {
+            content: '';
+            position: absolute;
+            top: -10px; left: -10px;
+            width: 32px; height: 32px;
+            background: var(--primary-glow);
+            border-radius: 50%;
+            animation: markerPulse 2s infinite;
+        }
+        @keyframes markerPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+
+        /* Waitlist Form */
+        .cta-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .waitlist-form-multi {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 8px; text-align: left; }
+        .waitlist-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: white;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        .waitlist-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .btn-full { width: 100%; grid-column: span 2; }
+
+        /* Reveal Animations */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .bento-card, .bento-large, .bento-wide { grid-column: span 12; }
+            .waitlist-form-multi { grid-template-columns: 1fr; }
+            .btn-full { grid-column: span 1; }
+            .bento-wide { flex-direction: column; text-align: center; }
+            .bento-wide .w-50 { width: 100%; }
+        }
+
+        /* Circular Progress */
+        .circular-progress {
+            position: relative; width: 100px; height: 100px;
+        }
+        .circular-progress svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .circular-progress circle {
+            fill: none; stroke-width: 8; stroke-linecap: round;
+        }
+        .circular-progress .bg { stroke: var(--glass-border); }
+        .circular-progress .progress {
+            stroke: var(--color);
+            stroke-dasharray: 283;
+            stroke-dashoffset: calc(283 - (283 * var(--val)) / 100);
+            transition: stroke-dashoffset 1s ease-in-out;
+        }
+        .inner-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-weight: 800; font-size: 20px;
+        }
+
+        .grid { display: grid; gap: 24px; }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <div class="logo-mark"><i class="fa-solid fa-map-location-dot"></i></div>
+                <span class="logo-text">WoQi</span>
+            </div>
+            <div class="nav-links">
+                <a href="#problem">The Problem</a>
+                <a href="#features">Features</a>
+                <a href="#vision">Vision</a>
+                <a href="#waitlist">Join Beta</a>
+            </div>
+            <div class="nav-cta">
+                <a href="#waitlist" class="btn btn-primary btn-sm">Join Beta</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container text-center">
+            <div class="reveal">
+                <div class="badge-new mb-6">
+                    <span class="pulse-dot"></span>
+                    Now accepting Beta Invites
+                </div>
+                <h1 class="hero-title text-gradient">
+                    The AI That Finds Your<br>Perfect Place to Focus.
+                </h1>
+                <p class="hero-subtitle">
+                    WoQi helps students and remote workers discover the best environments to study and work using AI-powered recommendations.
+                </p>
+                <div class="hero-cta">
+                    <a href="#waitlist" class="btn btn-primary btn-lg">Join the Beta <i class="fa-solid fa-arrow-right ml-2"></i></a>
+                </div>
+                
+                <!-- MVP Mockup -->
+                <div class="mt-16 reveal" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+                    <p class="text-sm text-muted mb-4 fw-bold" style="text-transform: uppercase; letter-spacing: 2px;">Here's how the MVP looks like</p>
+                    <div style="position: relative; padding: 10px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+                        <img src="phone-mockup.png" alt="WoQi App MVP" style="width: 100%; border-radius: 32px; display: block;">
+                        <div style="position: absolute; inset: 0; border-radius: 40px; box-shadow: inset 0 0 20px rgba(255,107,0,0.2); pointer-events: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Problem Section -->
+    <section id="problem" class="section bg-darker">
+        <div class="container">
+            <div class="section-header text-center reveal">
+                <h2 class="section-title">Focus Is Hard in the<br><span class="text-gradient">Modern World</span></h2>
+                <p class="section-subtitle">The environment dictates your output. We've seen the data.</p>
+            </div>
+            
+            <div class="grid grid-3">
+                <div class="bento-card reveal" style="--val: 71; --color: var(--primary-color);">
+                    <div class="circular-progress mx-auto mb-6" style="--val: 71; --color: var(--primary-color);">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="progress" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <div class="inner-text">71%</div>
+                    </div>
+                    <h3 class="text-center">Study Stress</h3>
+                    <p class="text-muted text-sm text-center mt-2">71% of students feel stressed by studying due to poor environments.</p>
+                </div>
+                <div class="bento-card reveal" style="--val: 50; --color: var(--accent-blue);">
+                    <div class="circular-progress mx-auto mb-6" style="--val: 50; --color: var(--accent-blue);">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="progress" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <div class="inner-text">50%</div>
+                    </div>
+                    <h3 class="text-center">Ineffective Methods</h3>
+                    <p class="text-muted text-sm text-center mt-2">50% struggle to find an effective study method.</p>
+                </div>
+                <div class="bento-card reveal" style="--val: 63; --color: var(--accent-purple);">
+                    <div class="circular-progress mx-auto mb-6" style="--val: 63; --color: var(--accent-purple);">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="progress" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <div class="inner-text">63%</div>
+                    </div>
+                    <h3 class="text-center">Constant Distraction</h3>
+                    <p class="text-muted text-sm text-center mt-2">63% get distracted by smartphones and social media.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Bento Grid -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="section-header text-center reveal">
+                <h2 class="section-title">Everything You Need<br>To <span class="text-gradient">Focus & Ship.</span></h2>
+            </div>
+            
+            <div class="bento-grid">
+                <!-- Large Feature: Map -->
+                <div class="bento-card bento-large reveal">
+                    <div class="icon-box text-primary"><i class="fa-solid fa-map-location-dot"></i></div>
+                    <h3>Live Study Map</h3>
+                    <p class="text-muted text-sm mt-2">Discover real-time study spots in New York City. See where the community is active right now.</p>
+                    <div class="map-container">
+                        <div id="leaflet-map"></div>
+                    </div>
+                </div>
+                
+                <!-- Small Features -->
+                <div class="bento-card reveal">
+                    <div class="icon-box text-blue"><i class="fa-solid fa-users"></i></div>
+                    <h3>Study Teams</h3>
+                    <p class="text-muted text-sm mt-2">Sync up in real-time. See exactly who is studying what, and where.</p>
+                </div>
+                
+                <div class="bento-card reveal">
+                    <div class="icon-box text-purple"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3>Deep Focus Mode</h3>
+                    <p class="text-muted text-sm mt-2">Block distractions. Lock into a flow state with an unbreakable timer.</p>
+                </div>
+
+                <div class="bento-card bento-wide reveal">
+                    <div style="flex: 1;">
+                        <div class="icon-box text-green"><i class="fa-solid fa-brain"></i></div>
+                        <h3>Smart Protocols</h3>
+                        <p class="text-muted text-sm mt-2">Adaptive techniques based on your cognitive load and task type.</p>
+                    </div>
+                    <div style="flex: 1; display: flex; gap: 10px; justify-content: flex-end;">
+                        <div style="padding: 15px; background: var(--glass); border-radius: 12px; border: 1px solid var(--glass-border);">Pomodoro</div>
+                        <div style="padding: 15px; background: var(--glass); border-radius: 12px; border: 1px solid var(--glass-border);">Feynman</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision Section -->
+    <section id="vision" class="section bg-darker">
+        <div class="container">
+            <div class="cta-card reveal text-center">
+                <h2 class="section-title">Our Vision</h2>
+                <p class="section-subtitle mb-8">Reimagining how people work together. Built for the ambitious, designed for the future.</p>
+                <p class="text-muted">WoQi is more than an app; it's a global network of productive spaces and focused minds.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Waitlist Section -->
+    <section id="waitlist" class="section">
+        <div class="container">
+            <div class="cta-card reveal text-center">
+                <div class="icon-box mx-auto text-primary"><i class="fa-solid fa-rocket"></i></div>
+                <h2 class="section-title text-gradient">Join the Waitlist</h2>
+                <p class="fw-bold mb-2">Built by students for students.</p>
+                <p class="text-muted mb-8">Get early access to WoQi and help shape the future of productivity.</p>
+                
+                <form action="https://formspree.io/f/xwvrpogd" method="POST" class="waitlist-form-multi">
+                    <div class="form-group">
+                        <label class="text-xs text-muted">Full Name</label>
+                        <input type="text" name="name" class="waitlist-input" placeholder="Jordan Lee" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-xs text-muted">Email</label>
+                        <input type="email" name="email" class="waitlist-input" placeholder="jordan@university.edu" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-xs text-muted">University</label>
+                        <input type="text" name="university" class="waitlist-input" placeholder="Stanford University" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-xs text-muted">Course of Specialization</label>
+                        <input type="text" name="course" class="waitlist-input" placeholder="Computer Science" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Request Early Access</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="section bg-darker" style="padding: 60px 0;">
+        <div class="container text-center">
+            <div class="logo mb-4" style="justify-content: center;">
+                <div class="logo-mark"><i class="fa-solid fa-map-location-dot"></i></div>
+                <span class="logo-text">WoQi</span>
+            </div>
+            <p class="text-muted text-sm">© 2026 WoQi Inc. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        // Reveal animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Interactive Map
+        document.addEventListener('DOMContentLoaded', () => {
+            const map = L.map('leaflet-map', {
+                center: [40.7128, -74.0060],
+                zoom: 13,
+                zoomControl: false,
+                attributionControl: false
+            });
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+            const locations = [
+                { name: "Central Library", coords: [40.7532, -73.9822], students: 42 },
+                { name: "Neon Roasters", coords: [40.7128, -74.0060], students: 15 },
+                { name: "The Study Hub", coords: [40.7306, -73.9352], students: 28 },
+                { name: "Focus Café", coords: [40.7589, -73.9851], students: 12 }
+            ];
+
+            locations.forEach(loc => {
+                const marker = L.divIcon({
+                    className: 'pulse-marker',
+                    html: '<div class="custom-marker"></div>',
+                    iconSize: [12, 12]
+                });
+                L.marker(loc.coords, { icon: marker }).addTo(map)
+                    .bindPopup(`<b>${loc.name}</b><br>${loc.students} students active`);
+            });
+        });
+    </script>
+</body>
+</html>
